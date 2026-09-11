@@ -49,13 +49,25 @@ for(const page of pages){
 }
 const banquet=readFileSync(path.join(dir,'banquet.html'),'utf8');
 for(const value of ['5,500','6,000','3〜24名様','前日まで','15分前'])assert(banquet.includes(value),'missing course information '+value);
-assert.match(readFileSync(path.join(dir,'cuisine.html'),'utf8'),/<video controls playsinline preload="none"/);
+for(const page of ['index.html','cuisine.html']){
+ const html=readFileSync(path.join(dir,page),'utf8');
+ const video=html.match(/<video\b[^>]*>/)?.[0];
+ assert(video,page+' missing silent footage');
+ for(const attribute of ['data-ambient-video','muted','loop','playsinline','preload="none"'])assert(video.includes(attribute),page+' missing video attribute '+attribute);
+ assert(!/\s(?:src|autoplay)=?/.test(video),page+' must defer media loading and respect reduced motion');
+ assert(!html.includes('motion-toggle'),page+' must not show the removed video controls');
+ assert(!/\scontrols(?:\s|=|>)/.test(video),page+' must not show native video controls');
+ for(const size of ['720','540']){
+  const asset=path.join(dir,'assets/charcoal-silent-'+size+'.mp4');
+  assert(statSync(asset).size<3*1024*1024,'silent video should remain under 3 MiB');
+ }
+}
 const manifest=JSON.parse(readFileSync(path.join(project,'.openai/hosting.json'),'utf8'));
 assert.equal(manifest.static.directory,'dist');
 const files=readdirSync(path.join(dir,'assets'));
 const bytes=files.reduce((sum,f)=>sum+statSync(path.join(dir,'assets',f)).size,0);
 console.log('Static checks passed: 5 pages, internal links/anchors, photos, video, phone and course facts.');
-console.log('Asset payload: '+(bytes/1024/1024).toFixed(2)+' MiB total; video is user-initiated.');
+console.log('Asset payload: '+(bytes/1024/1024).toFixed(2)+' MiB total; unobstructed silent video loads only in view, with reduced-motion support.');
 if(process.argv[2]){
  const base=process.argv[2].replace(/\/?$/,'/');
  for(const url of new Set(['',...pages,...urls])){
