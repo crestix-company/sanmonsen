@@ -20,7 +20,11 @@ Node.js 22以上で `node scripts/verify-site.mjs`。外部ライブラリ・ビ
 
 - Sites: .openai/hosting.json の static.directory は dist。登録済み project_id を再利用します。
 - Cloudflare **Pages**: フレームワークなし、ビルドコマンド空欄、出力ディレクトリ **dist**。Workers設定は使用しません。
-- GitHub Pages: リポジトリのルートではなく **dist の中身**を公開します。ルートのREADMEを配信する設定は不可。画像・ページは相対URLなのでプロジェクトパスにも対応します。
+- GitHub Pages: **Settings → Pages → Source: GitHub Actions**。同梱の `.github/workflows/pages.yml` がmainへのプッシュ時に検証を行い、**dist の中身だけ**を公開します。「Deploy from a branch / main / root」はREADMEが表示されるため使用しません。画像・ページは相対URLなのでプロジェクトパスにも対応します。
+
+GitHub Pages公開URL: https://crestix-company.github.io/sanmonsen/
+
+公開前のパス検証: `node scripts/verify-pages-prefix.mjs`。公開後はトップを含む全ページのHTMLが検証済みファイルと完全一致することまで自動検査します。
 
 ソースの保存先と実際のサイトURLは別です。新たな公開先に反映した際は、トップ・全5ページ・写真・動画・電話予約リンクを確認してください。
 
@@ -35,6 +39,6 @@ Node.js 22以上で `node scripts/verify-site.mjs`。外部ライブラリ・ビ
 
 ## 納品先と公開状態
 
-2026-09-11の改修を含むソースの納品先は https://github.com/crestix-company/sanmonsen です。今回の依頼はコミット・プッシュまでで、Sites・GitHub Pages・Cloudflareへの公開操作は含みません。リポジトリの閲覧URLと、実際のホームページの公開URLは別です。確認内容は QUALITY-CHECK.md を参照してください。
+ソースの納品先は https://github.com/crestix-company/sanmonsen です。初回納品はコミット・プッシュのみでしたが、その後の「ページが映ってない」という依頼でGitHub Pagesの公開設定を修正しました。Sites・Cloudflareの設定は変更していません。リポジトリの閲覧URLと、実際のホームページの公開URLは別です。確認内容は QUALITY-CHECK.md を参照してください。
 
 掲載情報の根拠と未提供情報は SOURCES.md を参照してください。

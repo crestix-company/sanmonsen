@@ -76,3 +76,12 @@ python3 -m http.server 4196 --bind 127.0.0.1 --directory dist
 - 動画上の「動画を停止／音声なし」の表示を削除した最新版を対象とする。
 - 公開ディレクトリはdistで、その直下に実際のindex.htmlと全ページが存在する。Cloudflare Pages向けの出力先もdist。Workers用の構成は不要。
 - 今回はGitHubへのコミット・プッシュのみ。GitHub Pagesの有効化、CloudflareやSitesの公開操作は対象外。以前のローカル限定の記録は、それぞれの改修時点の作業範囲を示す。
+
+## 追加依頼：GitHub PagesがREADMEを表示する問題
+
+- 画面収録と https://crestix-company.github.io/sanmonsen/ で説明書が表示される状態を確認。
+- 調査時のGitHub Pages設定はlegacy・main・root。実サイトはdist直下のため、JekyllがルートのREADMEをサイトとして公開していた。
+- 既存のGitHub Pages URLを維持し、公開元をGitHub Actionsへ切り替える修正。検証済みのdistだけをアップロードする専用ワークフローを追加。
+- ローカルで本番と同じ/sanmonsen/パスを再現し、全5ページ・写真・動画・リンク・存在しないURLの404を確認済み。
+- HTTP 200と店名だけでは説明書を見逃すため、配信HTMLと実サイトのHTMLが完全一致することを検査するよう修正。公開後もこの検証をワークフローで実施する。
+- デザイン・店舗情報・動画仕様・SitesとCloudflareの公開設定は変更しない。

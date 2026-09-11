@@ -73,7 +73,11 @@ if(process.argv[2]){
  for(const url of new Set(['',...pages,...urls])){
   const response=await fetch(new URL(url,base));
   assert.equal(response.status,200,'HTTP '+url);
-  if(!url||url.endsWith('.html'))assert((await response.text()).includes('三文銭'),'wrong page '+url);
+  if(!url||url.endsWith('.html')){
+   const served=await response.text();
+   const expected=readFileSync(path.resolve(dir,url||'index.html'),'utf8');
+   assert(served===expected,'Served HTML differs from the verified website: '+(url||'/')+' (README, stale release or wrong output folder)');
+  }
   else {assert(Number(response.headers.get('content-length'))>0,'empty served asset '+url);await response.body?.cancel();}
  }
  const response=await fetch(new URL('does-not-exist-validation',base));
