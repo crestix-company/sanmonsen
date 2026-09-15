@@ -47,7 +47,21 @@ for(const page of pages){
   assert(ids.get(file)?.has(hash),page+' missing anchor '+raw);
  }
 }
+const home=readFileSync(path.join(dir,'index.html'),'utf8');
+const signatureCard=home.match(/<a class="signature-card" href="\.\/cuisine\.html#muroran"[^>]*>([\s\S]*?)<\/a>/)?.[1];
+assert(signatureCard,'home must retain the Muroran cuisine link');
+assert.match(signatureCard,/class="signature-photo-pair"/);
+assert.equal((signatureCard.match(/<img\b/g)||[]).length,2,'signature card must show both provided photographs');
+for(const name of ['muroran-yakitori-960.webp','yakitori-750.webp'])assert(signatureCard.includes('./assets/'+name),'signature pair missing '+name);
+assert(statSync(path.join(dir,'assets/muroran-yakitori-960.webp')).size<180*1024,'new signature photograph should remain under 180 KiB');
 const banquet=readFileSync(path.join(dir,'banquet.html'),'utf8');
+for(const page of ['index.html','banquet.html','space.html']){
+ const html=readFileSync(path.join(dir,page),'utf8');
+ assert.match(html,/2時間飲み放題/,'missing two-hour drink notice in '+page);
+ assert(!/(?<!2時間)飲み放題(?:付き|が付きます)/.test(html),'drink notice missing duration in '+page);
+ assert(!html.includes('飲み放題の時間・'),'confirmed duration must not be presented as unknown');
+}
+assert.equal((banquet.match(/<p class="eyebrow rust">2時間飲み放題付き<\/p>/g)||[]).length,3,'every course must show the two-hour drink duration');
 for(const value of ['5,500','6,000','3〜24名様','前日まで','15分前'])assert(banquet.includes(value),'missing course information '+value);
 for(const page of ['index.html','cuisine.html']){
  const html=readFileSync(path.join(dir,page),'utf8');
